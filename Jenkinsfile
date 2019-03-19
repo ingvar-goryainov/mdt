@@ -1,6 +1,6 @@
 node {
     stage ('Checkout') {
-        git credentialsId: 'gh-token-demo', url: 'https://github.com/dbielik/mdt'
+        checkout scm
     }
     stage ('Build') {
         nodejs('Node10-2') {
