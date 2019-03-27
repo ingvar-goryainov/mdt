@@ -11,24 +11,24 @@ node('Slave_node_1') {
 
             cd "$WORKSPACE/www/js"
             uglifyjs --timings init.js -o ../min/custom-min.js
-
-            cd "$WORKSPACE"
-            tar --exclude='./www/css' --exclude='./www/js' -c -z -f archive.tgz ./www/
-
+            
             '''
-    stage('SonarQube') {
-        def scannerHome = tool 'sonarqube-scanne-3.3'
-        def nodeHome = tool name: 'Node10', type: 'nodejs'
-        withEnv(["PATH+NODE=${nodeHome}:${nodeHome}/bin"]) {
-            withSonarQubeEnv('sonar-default') {
-                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=mdt -Dsonar.sources=www"
-            }
+            // cd "$WORKSPACE"
+            // tar --exclude='./www/css' --exclude='./www/js' -c -z -f archive.tgz ./www/
+
+            stage('SonarQube') {
+                def scannerHome = tool 'sonarqube-scanner-3.3'
+                def nodeHome = tool name: 'Node10', type: 'nodejs'
+                withEnv(["PATH+NODE=${nodeHome}:${nodeHome}/bin"]) {
+                    withSonarQubeEnv('sonar-default') {
+                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=mdt -Dsonar.sources=www"
+                    }
+                }
+                waitForQualityGate abortPipeline: true
+            }          
         }
-        waitForQualityGate abortPipeline: true
     }
-        }
+    // stage('Archive'){
+    //    archiveArtifacts 'archive.tgz'
     }
-    stage('Archive'){
-        archiveArtifacts 'archive.tgz'
-    }
-}
+
